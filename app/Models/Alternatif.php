@@ -16,7 +16,7 @@ class Alternatif extends Model
      *
      * @var string
      */
-    protected $table = 'alternatifs'; // Explicitly define table name
+    protected $table = 'alternatif'; // Explicitly define table name
 
     /**
      * The primary key for the model.
@@ -34,6 +34,7 @@ class Alternatif extends Model
         'alternatif_id', // Include primary key if it's not auto-incrementing and you need to mass-assign it
         'user_id',
         'name',
+        'code'
     ];
 
     /**

@@ -42,7 +42,15 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
+    /**
+     * Get the name of the "auth identifier" column.
+     *
+     * @return string
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'user_id';
+    }
     /**
      * Get the alternatives associated with the user.
      */

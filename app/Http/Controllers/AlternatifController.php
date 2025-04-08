@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Alternatif;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Exception;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use function Laravel\Prompts\alert;
 
 class AlternatifController extends Controller
 {
@@ -22,12 +27,29 @@ class AlternatifController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'user_id' => 'required|integer|exists:users,user_id',
             'name' => 'required|string|max:255',
-            'value' => 'required|string|max:255', // Adjust validation rules as needed
+            'code' => 'required|string|max:255',
         ]);
 
-        $alternatif = Alternatif::create($request->all());
-        return response()->json($alternatif, 201); // 201 Created
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|integer|exists:users,user_ID',
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        // Check if the user_id exists in the users table
+        try {
+            alert('User ID: ' . $request->user_id);
+            $alternatif = Alternatif::create($request->all());
+            return response()->json($alternatif, 201);
+        } catch (Exception $e) {
+            Log::error('Error creating alternatif: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to create alternatif.'], 500);
+        }
     }
 
     /**

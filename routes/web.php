@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::resource('alternatifs', AlternatifController::class);
+Route::post('/api/alternatif', [AlternatifController::class, 'store']);
 
 Route::resource('kriteria', KriteriaController::class);
 Route::resource('kriteria-value', KriteriaValueController::class);
