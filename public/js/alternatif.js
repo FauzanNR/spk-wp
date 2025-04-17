@@ -1,15 +1,24 @@
 window.data = [];
+window.editData
 
-async function fetchData() {
+async function fetchDataByUser() {
+    const userId = parseInt(document.getElementById('current_user_id').value.trim());
     try {
-        const response = await fetch('/api/alternatif');
+        const response = await fetch(`/api/alternatif/user/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+        });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        data = await response.json();
+        window.data = await response.json();
         renderTable();
     } catch (error) {
-        console.error("Could not fetch alternatives:", error);
+        console.error("Could not fetch alternatives by user:", error);
     }
 }
 
@@ -72,60 +81,86 @@ async function addData() {
 }
 
 async function editData(index) {
-    const id = data[index].alternatif_ID; // Assuming your API returns the ID
-    const newName = prompt("Enter new name:", data[index].name);
-    const newCode = prompt("Enter new code:", data[index].code);
+    const id = window.data[index].alternatif_id; // Assuming your API returns the ID
+    const alternatifData = window.data[index]; // Get the alternatif data for the selected index
 
-    if (newName && newCode) {
+    // Update the form fields with the current data for editing
+    document.getElementById('name').value = data[index].name;
+    document.getElementById('code').value = data[index].code;
+
+    // Change the button to "Save" or "Edit" mode
+    const addButton = document.getElementById('add-button');
+    const form = document.getElementById('alternatif-form');
+    form.action = `/api/alternatif/${id}`;
+    addButton.textContent = 'Save';
+    addButton.onclick = null;
+
+    addButton.addEventListener('click', async function (event) {
+    event.preventDefault(); // Prevent default form submission
+    const newName = document.getElementById('name').value.trim();
+    const newCode = document.getElementById('code').value.trim();
+    alternatifData.name = newName;
+    alternatifData.code = newCode;
+        if (!newName || !newCode) {
+            alert('Please fill in the Name and Code fields.');
+            return;
+        }
+        if (newName && newCode) {
+            try {
+                const response = await fetch(`/api/alternatif/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Add CSRF token
+                    },
+                    body: JSON.stringify(alternatifData),
+                });
+
+                // if (!response.ok) {
+                //     const errorData = await response.json();
+                //     console.error("Error updating alternative:", errorData);
+                //     alert(`Error updating alternative: ${errorData.message || 'Unknown error'}`);
+                //     return;
+                // }
+                renderTable();
+            } catch (error) {
+                console.error("Could not update alternative:", error);
+                alert(`Could not update alternative: ${error.message}`);
+            }
+        } else {
+            alert('Please fill in the Name and Code fields.');
+        }
+    });
+}
+async function deleteData(index) {
+    const id = window.data[index].alternatif_id;
+    alert(id);
+    if (confirm("Are you sure you want to delete this item?")) {
         try {
-            const response = await fetch(`/api/alternatifs/${id}`, {
-                method: 'PUT',
+            const response = await fetch(`/api/alternatif/${id}`, {
+                method: 'DELETE',
                 headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Add CSRF token
                 },
-                body: JSON.stringify({ name: newName, code: newCode }),
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error("Error updating alternative:", errorData);
-                // Optionally display error messages
+                console.error("Error deleting alternative:", errorData);
+                alert(`Error deleting alternative: ${errorData.message || 'Unknown error'}`);
                 return;
             }
 
-            const updatedAlternatif = await response.json();
-            data[index] = updatedAlternatif;
-            renderTable();
-
-        } catch (error) {
-            console.error("Could not update alternative:", error);
-        }
-    }
-}
-
-async function deleteData(index) {
-    const id = data[index].alternatif_ID; // Assuming your API returns the ID
-    if (confirm("Are you sure you want to delete this item?")) {
-        try {
-            const response = await fetch(`/api/alternatifs/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Add CSRF token
-                },
-            });
-
-            if (!response.ok) {
-                console.error("Error deleting alternative:", response.status);
-                // Optionally display an error message
-                return;
-            }
-
+            // Remove the deleted item from the data array
             data.splice(index, 1);
             renderTable();
+            alert('Alternative deleted successfully!');
 
         } catch (error) {
             console.error("Could not delete alternative:", error);
+            alert(`Could not delete alternative: ${error.message}`);
         }
     }
 }
@@ -133,8 +168,7 @@ async function deleteData(index) {
 function renderTable() {
     const tableBody = document.getElementById('alternatif-table');
     tableBody.innerHTML = '';
-
-    data.forEach((item, index) => {
+    window.data.forEach((item, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td class="border px-4 py-2">${item.name}</td>
@@ -146,7 +180,17 @@ function renderTable() {
         `;
         tableBody.appendChild(row);
     });
+        // Reset the form and button
+        
+    const addButton = document.getElementById('add-button');
+    const form = document.getElementById('alternatif-form');
+    form.reset(); // Reset the form fields
+    document.getElementById('alternatif-form').reset();
+    form.action = '/api/alternatif';
+    addButton.textContent = 'Add';
+    addButton.onclick = addData;
+
 }
 
 // Fetch initial data when the page loads
-// document.addEventListener('DOMContentLoaded', fetchData);
+document.addEventListener('DOMContentLoaded', fetchDataByUser);

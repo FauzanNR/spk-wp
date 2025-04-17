@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Alternatif;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -61,19 +62,41 @@ class AlternatifController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Display a listing of the resource belonging to a specific user.
      */
-    public function update(Request $request, Alternatif $alternatif)
+    public function getByUser($userId)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'value' => 'required|string|max:255', // Adjust validation rules as needed
-        ]);
-
-        $alternatif->update($request->all());
-        return response()->json($alternatif, 200); // 200 OK
+        $alternatifs = Alternatif::where('user_id', $userId)->get();
+        return response()->json($alternatifs);
     }
 
+    /**
+     * Update a specific alternatif item by ID.
+     */
+    public function updateById(Request $request, $id)
+    {
+        $request->validate([
+            'user_id' => 'required|integer|exists:users,user_id',
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:255',
+        ]);
+
+        $alternatif = Alternatif::find($id);
+
+        if (!$alternatif) {
+            return response()->json(['error' => 'Alternatif not found.'], 404); // 404 Not Found
+        }
+
+        Alternatif::where('alternatif_id', $id)->update([
+            'name' => $request->name,
+            'code' => $request->code,
+        ]);
+
+        return response()->json([
+            'message' => 'Alternatif updated successfully.',
+            'alternatif' => $alternatif
+        ], 200); // 200 OK
+    }
     /**
      * Remove the specified resource from storage.
      */
@@ -81,5 +104,28 @@ class AlternatifController extends Controller
     {
         $alternatif->delete();
         return response()->json(null, 204); // 204 No Content
+    }
+
+    /**
+     * Remove a specific alternatif item by ID and delete related kriteria values.
+     */
+    public function destroyById($id)
+    {
+        $alternatif = Alternatif::find($id);
+
+        if (!$alternatif) {
+            return response()->json(['error' => 'Alternatif not found.'], 404); // 404 Not Found
+        }
+
+        // Delete related kriteria values
+        $kriteriaDeleted = DB::table('kriteria_value')->where('alternatif_id', $id)->delete();
+
+        // Delete the alternatif
+        $alternatif->delete();
+
+        return response()->json([
+            'message' => 'Alternatif and related kriteria values deleted successfully.',
+            'kriteria_deleted_count' => $kriteriaDeleted
+        ], 200); // 200 OK
     }
 }

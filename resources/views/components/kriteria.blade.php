@@ -3,6 +3,7 @@
         <h2 class="text-2xl font-bold text-center">
             Kriteria Page Content
         </h2>
+
         <div class="mt-6">
             <form id="kriteria-form" class="mb-4">
                 <div class="mb-4">

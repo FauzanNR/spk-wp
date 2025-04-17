@@ -31,16 +31,19 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    // ... other protected routes
+
+    Route::get('/api/alternatif/user/{userId}', [AlternatifController::class, 'getByUser'])->name('alternatif.user');
+    Route::get('/api/alternatif', [AlternatifController::class, 'index']);
+    Route::get('/api/alternatif/{alternatif}', [AlternatifController::class, 'show']);
+    Route::put('/api/alternatif/{id}', [AlternatifController::class, 'updateById'])->name('alternatif.updateById');
+    Route::delete('/api/alternatif/{id}', [AlternatifController::class, 'destroyById'])->name('alternatif.destroy');
+    Route::post('/api/alternatif', [AlternatifController::class, 'store'])->name('alternatif.store');
+
+    Route::resource('kriteria', KriteriaController::class);
+    Route::resource('kriteria-value', KriteriaValueController::class);
 });
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-Route::resource('alternatifs', AlternatifController::class);
-Route::post('/api/alternatif', [AlternatifController::class, 'store']);
-
-Route::resource('kriteria', KriteriaController::class);
-Route::resource('kriteria-value', KriteriaValueController::class);

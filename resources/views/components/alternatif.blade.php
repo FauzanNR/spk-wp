@@ -6,11 +6,13 @@
         </h2>
         <div class="mt-6">
             <form id="alternatif-form" class="mb-4">
+                @csrf
+                @method('PUT') {{-- Or @method('PATCH') --}}
                 <div class="flex space-x-4">
                     <input type="text" id="name" placeholder="Name" class="w-full p-2 border rounded">
                     <input type="text" id="code" placeholder="Code" class="w-full p-2 border rounded">
                 </div>
-                <button type="button" onclick="addData()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Add</button>
+                <button type="button" id="add-button" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Add</button>
             </form>
             <table class="w-full bg-white rounded shadow">
                 <thead>

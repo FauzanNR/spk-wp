@@ -68,61 +68,6 @@ function showPage(pageId, element) {
     }
 }
 
-// CRUD operations for Alternatif page
-// let data = [];
-
-// function addData() {
-//     const name = document.getElementById('name').value;
-//     const code = document.getElementById('code').value;
-
-//     if (name && code) {
-//         data.push({
-//             name,
-//             code: code
-//         });
-//         renderTable();
-//         document.getElementById('alternatif-form').reset();
-//     }
-// }
-
-// function editData(index) {
-//     const name = prompt("Enter new name:", data[index].name);
-//     const code = prompt("Enter new value:", data[index].code);
-
-//     if (name && code) {
-//         data[index] = {
-//             name,
-//             value: code
-//         };
-//         renderTable();
-//     }
-// }
-
-// function deleteData(index) {
-//     if (confirm("Are you sure you want to delete this item?")) {
-//         data.splice(index, 1);
-//         renderTable();
-//     }
-// }
-
-// function renderTable() {
-//     const tableBody = document.getElementById('alternatif-table');
-//     tableBody.innerHTML = '';
-
-//     data.forEach((item, index) => {
-//         const row = document.createElement('tr');
-//         row.innerHTML = `
-//             <td class="border px-4 py-2">${item.name}</td>
-//             <td class="border px-4 py-2">${item.code}</td>
-//             <td class="border px-4 py-2">
-//                 <button onclick="editData(${index})" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
-//                 <button onclick="deleteData(${index})" class="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
-//             </td>
-//         `;
-//         tableBody.appendChild(row);
-//     });
-// }
-
 // CRUD operations for Kriteria page
 let kriteriaData = [];
 
