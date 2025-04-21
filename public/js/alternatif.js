@@ -1,5 +1,4 @@
 window.data = [];
-window.editData
 
 async function fetchDataByUser() {
     const userId = parseInt(document.getElementById('current_user_id').value.trim());
@@ -185,7 +184,6 @@ function renderTable() {
     const addButton = document.getElementById('add-button');
     const form = document.getElementById('alternatif-form');
     form.reset(); // Reset the form fields
-    document.getElementById('alternatif-form').reset();
     form.action = '/api/alternatif';
     addButton.textContent = 'Add';
     addButton.onclick = addData;

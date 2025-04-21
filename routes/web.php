@@ -33,13 +33,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/api/alternatif/user/{userId}', [AlternatifController::class, 'getByUser'])->name('alternatif.user');
-    Route::get('/api/alternatif', [AlternatifController::class, 'index']);
-    Route::get('/api/alternatif/{alternatif}', [AlternatifController::class, 'show']);
     Route::put('/api/alternatif/{id}', [AlternatifController::class, 'updateById'])->name('alternatif.updateById');
     Route::delete('/api/alternatif/{id}', [AlternatifController::class, 'destroyById'])->name('alternatif.destroy');
     Route::post('/api/alternatif', [AlternatifController::class, 'store'])->name('alternatif.store');
 
-    Route::resource('kriteria', KriteriaController::class);
+    Route::get('/api/kriteria/user/{userId}', [KriteriaController::class, 'getByUser'])->name('kriteria.user');
+    Route::post('/api/kriteria', [KriteriaController::class, 'store'])->name('kriteria.store');
+    Route::delete('/api/kriteria/{id}', [KriteriaController::class, 'destroyById'])->name('kriteria.destroy');
+
+
     Route::resource('kriteria-value', KriteriaValueController::class);
 });
 

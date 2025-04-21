@@ -12,6 +12,7 @@
 
 <body class="bg-gray-200">
     <div class="flex h-screen">
+        <input type="hidden" id="current_user_id" value="{{ auth()->id() }}">
         <!-- Sidebar -->
         <div class="bg-gray-900 text-white w-64 p-4 hidden md:block">
             <div class="text-lg font-bold mb-8">SPK Weight Product</div>
@@ -125,6 +126,7 @@
     </div>
     <script src="js/dashboard.js"></script> <!-- Include the dashboard script -->
     <script src="js/alternatif.js"></script> <!-- Include the alternatif script -->
+    <script src="js/kriteria.js"></script> <!-- Include the alternatif script -->
 </body>
 
 </html>

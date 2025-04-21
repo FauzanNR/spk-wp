@@ -44,7 +44,6 @@ class AlternatifController extends Controller
         }
         // Check if the user_id exists in the users table
         try {
-            alert('User ID: ' . $request->user_id);
             $alternatif = Alternatif::create($request->all());
             return response()->json($alternatif, 201);
         } catch (Exception $e) {

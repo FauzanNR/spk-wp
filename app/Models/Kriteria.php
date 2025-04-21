@@ -25,7 +25,7 @@ class Kriteria extends Model
     use HasFactory;
 
     protected $primaryKey = 'kriteria_ID';
-    protected $fillable = ['nama', 'bobot', 'tipe'];
+    protected $fillable = ['user_id', 'nama', 'bobot', 'tipe'];
 
     public function kriteriaValues()
     {

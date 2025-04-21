@@ -4,12 +4,6 @@
               Hasil Page Content
           </h2>
           <div class="mt-6">
-              <select
-                  id="alternatif-select"
-                  class="mb-4 w-full p-2 border rounded"
-                  onchange="handleAlternatifSelect()">
-                  <option value="">Select Alternatif</option>
-              </select>
               <div id="hasil-container" class="hidden">
                   <table class="w-full bg-white rounded shadow">
                       <thead>

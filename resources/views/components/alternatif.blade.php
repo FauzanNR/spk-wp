@@ -1,5 +1,5 @@
 <div id="alternatif" class="page hidden">
-    <input type="hidden" id="current_user_id" value="{{ auth()->id() }}">
+
     <div class="bg-white p-6 rounded shadow">
         <h2 class="text-2xl font-bold text-center">
             Alternatif Page Content

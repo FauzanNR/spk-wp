@@ -7,6 +7,19 @@ use App\Models\KriteriaValue;
 
 class KriteriaValueController extends Controller
 {
+
+
+    public function kriteriaValueByAlternatif($alternatifId)
+    {
+        $kriteriaValues = KriteriaValue::where('alternatif_id', $alternatifId)->get();
+        return response()->json($kriteriaValues);
+    }
+
+    public function kriteriaValueByKriteria($kriteriaId)
+    {
+        $kriteriaValues = KriteriaValue::where('kriteria_id', $kriteriaId)->get();
+        return response()->json($kriteriaValues);
+    }
     /**
      * Display a listing of the resource.
      *
