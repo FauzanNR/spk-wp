@@ -4,7 +4,7 @@
     class="modal fixed inset-0 bg-gray-800 bg-opacity-50 items-center justify-center hidden">
     <div class="bg-white p-6 rounded shadow-lg w-full max-w-md mx-auto">
         <h2 class="text-xl font-bold mb-4">Edit Alternatif</h2>
-        <input type="hidden" id="data-id-on-edit" />
+        <input type="hidden" id="alternatif-data-id-on-edit" />
         <form id="edit-form" onsubmit="return false;">
             <div class="mb-4">
                 <label for="edit-alternatif-name" class="block text-gray-700">Name</label>

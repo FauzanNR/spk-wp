@@ -98,7 +98,7 @@ async function addData() {
 }
 
 async function editData() {
-    index = document.getElementById("data-id-on-edit").value;
+    index = document.getElementById("alternatif-data-id-on-edit").value;
     alternatifData = window.data[index];
     const newName = document
         .getElementById("edit-alternatif-name")
@@ -207,7 +207,7 @@ function openEditModal($index) {
     document.getElementById("edit-alternatif-modal").classList.add("active");
     document.getElementById("edit-alternatif-modal").classList.remove("hidden");
 
-    document.getElementById("data-id-on-edit").value = $index;
+    document.getElementById("alternatif-data-id-on-edit").value = $index;
     document.getElementById("edit-alternatif-name").value = data[$index].name;
     document.getElementById("edit-alternatif-code").value = data[$index].code;
 }

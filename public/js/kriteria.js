@@ -134,70 +134,51 @@ async function deleteKriteria(index) {
     }
 }
 
-async function editKriteria(index) {
+async function editKriteria() {
+    index = document.getElementById("kriteria-data-index-on-edit").value;
     const id = window.kriteriaData[index].kriteria_id;
     const kriteriaData = window.kriteriaData[index];
-    document.getElementById("nama").value = kriteriaData.nama;
-    document.getElementById("bobot").value = kriteriaData.bobot;
-    document.querySelector(
-        `input[name="keterangan"][value="${kriteriaData.tipe}"]`
-    ).checked = true;
 
-    const addButton = document.getElementById("add-kriteria-button");
-    const form = document.getElementById("kriteria-form");
-    form.reset(); // Reset the form fields
-    form.action = `/api/kriteria/${id}`;
-    addButton.textContent = "Save Changes";
-    addButton.onclick = null;
+    const newNama = document.getElementById("edit-kriteria-name").value.trim();
+    const newBobot = document
+        .getElementById("edit-kriteria-bobot")
+        .value.trim();
+    const newTipe = document.querySelector(
+        'input[name="edit-tipe"]:checked'
+    ).value;
 
-    addButton.addEventListener("click", async function (event) {
-        event.preventDefault(); // Prevent default form submission
-        const userId = parseInt(
-            document.getElementById("current_user_id").value.trim()
-        );
-        const newNama = document.getElementById("nama").value.trim();
-        const newBobot = document.getElementById("bobot").value.trim();
-        const newTipe = document.querySelector(
-            'input[name="keterangan"]:checked'
-        ).value;
+    if (!newNama || !newBobot || !newTipe) {
+        alert("Please fill in all fields.");
+        return;
+    }
 
-        if (!newNama || !newBobot || !newTipe) {
-            alert("Please fill in all fields.");
-            return;
-        }
-
-        if (
-            newNama &&
-            newBobot &&
-            (newTipe === "benefit" || newTipe === "cost")
-        ) {
-            if (confirm("Are you sure you want to update this item?")) {
-                kriteriaData.nama = newNama;
-                kriteriaData.bobot = newBobot;
-                kriteriaData.tipe = newTipe;
-                try {
-                    const response = await fetch(`/api/kriteria/${id}`, {
-                        method: "PUT",
-                        headers: {
-                            Accept: "application/json",
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": document
-                                .querySelector('meta[name="csrf-token"]')
-                                .getAttribute("content"),
-                        },
-                        body: JSON.stringify(kriteriaData),
-                    });
-                } catch (error) {
-                    console.error("Error updating kriteria:", error);
-                    alert(`Error updating kriteria: ${error.message}`);
-                }
-
-                renderKriteriaTable();
+    if (newNama && newBobot && (newTipe === "benefit" || newTipe === "cost")) {
+        if (confirm("Are you sure you want to update this item?")) {
+            kriteriaData.nama = newNama;
+            kriteriaData.bobot = newBobot;
+            kriteriaData.tipe = newTipe;
+            try {
+                const response = await fetch(`/api/kriteria/${id}`, {
+                    method: "PUT",
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute("content"),
+                    },
+                    body: JSON.stringify(kriteriaData),
+                });
+            } catch (error) {
+                console.error("Error updating kriteria:", error);
+                alert(`Error updating kriteria: ${error.message}`);
             }
-        } else {
-            alert("Please fill in the Nama, Bobot, and Select the Tipe");
+            renderKriteriaTable();
+            closeEditKriteriaModal();
         }
-    });
+    } else {
+        alert("Please fill in the Nama, Bobot, and Select the Tipe");
+    }
 }
 
 function renderKriteriaTable() {
@@ -211,7 +192,7 @@ function renderKriteriaTable() {
             <td class="border px-4 py-2">${item.bobot}</td>
             <td class="border px-4 py-2">${item.tipe}</td>
             <td class="border px-4 py-2">
-                <button onclick="editKriteria(${index})" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
+                <button onclick="openEditKriteriaModal(${index})" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
                 <button onclick="deleteKriteria(${index})" class="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
             </td>
         `;
@@ -228,3 +209,22 @@ function renderKriteriaTable() {
 
 // Fetch initial data when the page loads
 document.addEventListener("DOMContentLoaded", fetchKriteriaDataByUser);
+
+function openEditKriteriaModal($index) {
+    document.getElementById("edit-kriteria-modal").classList.add("active");
+    document.getElementById("edit-kriteria-modal").classList.remove("hidden");
+
+    document.getElementById("kriteria-data-index-on-edit").value = $index;
+    document.getElementById("edit-kriteria-name").value =
+        kriteriaData[$index].nama;
+    document.getElementById("edit-kriteria-bobot").value =
+        kriteriaData[$index].bobot;
+    document.querySelector(
+        `input[name="edit-tipe"][value=${kriteriaData[$index].tipe}]`
+    ).checked = true;
+}
+
+function closeEditKriteriaModal() {
+    document.getElementById("edit-kriteria-modal").classList.add("hidden");
+    document.getElementById("edit-kriteria-modal").classList.remove("active");
+}

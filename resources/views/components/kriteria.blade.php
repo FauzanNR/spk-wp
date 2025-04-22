@@ -3,7 +3,7 @@
         <h2 class="text-2xl font-bold text-center mb-4">
             Kriterias
         </h2>
-
+        @include('.components.edit_kriteria')
         <div class="mt-6">
             <form id="kriteria-form" class="mb-6">
                 @csrf
