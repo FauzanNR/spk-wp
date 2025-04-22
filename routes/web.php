@@ -42,7 +42,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/api/kriteria/{id}', [KriteriaController::class, 'destroyById'])->name('kriteria.destroy');
     Route::put('/api/kriteria/{id}', [KriteriaController::class, 'updateById'])->name('kriteria.updateById');
 
-    Route::resource('kriteria-value', KriteriaValueController::class);
+
+    Route::post('/api/kriteria-value', [KriteriaValueController::class, 'store'])->name('kriteria-value.store');
+    Route::get('/api/kriteria-value/user/{userId}', [KriteriaValueController::class, 'getByUser'])->name('kriteria-value.user');
+    Route::delete('/api/kriteria-value/{id}', [KriteriaValueController::class, 'destroyById'])->name('kriteria-value.destroy');
+    Route::put('/api/kriteria-value/{id}', [KriteriaValueController::class, 'updateById'])->name('kriteria-value.updateById');
 });
 
 
