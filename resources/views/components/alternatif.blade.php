@@ -14,6 +14,7 @@
                 </div>
                 <button type="button" id="add-button" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Add</button>
             </form>
+            @include('.components.edit_alternatif')
             <table class="w-full bg-white rounded shadow">
                 <thead>
                     <tr>

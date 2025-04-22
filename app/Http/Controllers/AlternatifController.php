@@ -18,8 +18,7 @@ class AlternatifController extends Controller
      */
     public function index()
     {
-        $alternatifs = Alternatif::all();
-        return response()->json($alternatifs);
+        return view('alternatif');
     }
 
     /**

@@ -134,22 +134,70 @@ async function deleteKriteria(index) {
     }
 }
 
-function editKriteria(index) {
-    const nama = prompt("Enter new nama:", kriteriaData[index].nama);
-    const bobot = prompt("Enter new bobot:", kriteriaData[index].bobot);
-    const keterangan = prompt(
-        "Enter new keterangan (Benefit/Cost):",
-        kriteriaData[index].keterangan
-    );
+async function editKriteria(index) {
+    const id = window.kriteriaData[index].kriteria_id;
+    const kriteriaData = window.kriteriaData[index];
+    document.getElementById("nama").value = kriteriaData.nama;
+    document.getElementById("bobot").value = kriteriaData.bobot;
+    document.querySelector(
+        `input[name="keterangan"][value="${kriteriaData.tipe}"]`
+    ).checked = true;
 
-    if (nama && bobot && (keterangan === "Benefit" || keterangan === "Cost")) {
-        kriteriaData[index] = {
-            nama,
-            bobot,
-            keterangan,
-        };
-        renderKriteriaTable();
-    }
+    const addButton = document.getElementById("add-kriteria-button");
+    const form = document.getElementById("kriteria-form");
+    form.reset(); // Reset the form fields
+    form.action = `/api/kriteria/${id}`;
+    addButton.textContent = "Save Changes";
+    addButton.onclick = null;
+
+    addButton.addEventListener("click", async function (event) {
+        event.preventDefault(); // Prevent default form submission
+        const userId = parseInt(
+            document.getElementById("current_user_id").value.trim()
+        );
+        const newNama = document.getElementById("nama").value.trim();
+        const newBobot = document.getElementById("bobot").value.trim();
+        const newTipe = document.querySelector(
+            'input[name="keterangan"]:checked'
+        ).value;
+
+        if (!newNama || !newBobot || !newTipe) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        if (
+            newNama &&
+            newBobot &&
+            (newTipe === "benefit" || newTipe === "cost")
+        ) {
+            if (confirm("Are you sure you want to update this item?")) {
+                kriteriaData.nama = newNama;
+                kriteriaData.bobot = newBobot;
+                kriteriaData.tipe = newTipe;
+                try {
+                    const response = await fetch(`/api/kriteria/${id}`, {
+                        method: "PUT",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document
+                                .querySelector('meta[name="csrf-token"]')
+                                .getAttribute("content"),
+                        },
+                        body: JSON.stringify(kriteriaData),
+                    });
+                } catch (error) {
+                    console.error("Error updating kriteria:", error);
+                    alert(`Error updating kriteria: ${error.message}`);
+                }
+
+                renderKriteriaTable();
+            }
+        } else {
+            alert("Please fill in the Nama, Bobot, and Select the Tipe");
+        }
+    });
 }
 
 function renderKriteriaTable() {

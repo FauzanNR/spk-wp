@@ -40,7 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/kriteria/user/{userId}', [KriteriaController::class, 'getByUser'])->name('kriteria.user');
     Route::post('/api/kriteria', [KriteriaController::class, 'store'])->name('kriteria.store');
     Route::delete('/api/kriteria/{id}', [KriteriaController::class, 'destroyById'])->name('kriteria.destroy');
-
+    Route::put('/api/kriteria/{id}', [KriteriaController::class, 'updateById'])->name('kriteria.updateById');
 
     Route::resource('kriteria-value', KriteriaValueController::class);
 });

@@ -7,6 +7,26 @@
     <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Custom styles for dropdown */
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        /* Make sidebar fixed height and not scrollable */
+        #sidebar {
+            height: 100vh;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        /* Make main content scrollable */
+        #main-content {
+            overflow-y: auto;
+            height: 100vh;
+            flex-grow: 1;
+        }
+    </style>
 </head>
 
 
@@ -14,7 +34,7 @@
     <div class="flex h-screen">
         <input type="hidden" id="current_user_id" value="{{ auth()->id() }}">
         <!-- Sidebar -->
-        <div class="bg-gray-900 text-white w-64 p-4 hidden md:block">
+        <div id="sidebar" class="bg-gray-900 text-white w-64 p-4 hidden md:block">
             <div class="text-lg font-bold mb-8">SPK Weight Product</div>
             <nav>
                 <ul>
@@ -78,7 +98,7 @@
             </nav>
         </div>
         <!-- Main content -->
-        <div class="flex-1 p-6" onclick="closeMobileNav()">
+        <div id="main-content" class="flex-1 p-6" onclick="closeMobileNav()">
             <div class="flex justify-between items-center mb-6">
                 <div class="md:hidden">
                     <button id="menu-button" class="text-gray-500 focus:outline-none" onclick="toggleMobileNav(event)">

@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Validator;
 
 class KriteriaController extends Controller
 {
+
+    public function index()
+    {
+        return view('kriteria');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -76,16 +81,31 @@ class KriteriaController extends Controller
      * @param  \App\Models\Kriteria  $kriteria
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Kriteria $kriteria)
+    public function updateById(Request $request, $id)
     {
         $request->validate([
+            'user_id' => 'required|integer|exists:users,user_id',
             'nama' => 'sometimes|required',
             'bobot' => 'sometimes|required|integer',
             'tipe' => 'sometimes|required|in:cost,benefit',
         ]);
 
-        $kriteria->update($request->all());
-        return response()->json($kriteria, 200);
+        $kriteria = Kriteria::findOrFail($id);
+        if (!$kriteria) {
+            return response()->json(['error' => 'Kriteria not found'], 404);
+        }
+        Kriteria::where('kriteria_id', $id)->update([
+            'nama' => $request->nama,
+            'bobot' => $request->bobot,
+            'tipe' => $request->tipe,
+            'updated_at' => Carbon::now(),
+        ]);
+
+
+        return response()->json([
+            'message' => 'Alternatif updated successfully.',
+            'alternatif' => $kriteria
+        ], 200); // 200 OK
     }
 
     /**
