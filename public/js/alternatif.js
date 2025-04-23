@@ -79,7 +79,6 @@ async function addData() {
                 })
                 .then((data) => {
                     // Process your JSON data (this will be the newly created alternatif)
-                    console.log("Data added successfully:", data);
                     window.data.push(data); // Assuming 'data' is a global array
                     window.renderTable(); // Assuming 'renderTable' is a global function
                     document.getElementById("alternatif-form").reset();

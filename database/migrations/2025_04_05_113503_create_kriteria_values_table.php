@@ -15,11 +15,12 @@ return new class extends Migration
     {
         Schema::create('kriteria_value', function (Blueprint $table) {
             $table->id('kriteria_value_id')->primary();
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('alternatif_id');
             $table->unsignedBigInteger('kriteria_id');
             $table->integer('value');
             $table->timestamps();
-
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->foreign('alternatif_id')->references('alternatif_id')->on('alternatif')->onDelete('cascade');
             $table->foreign('kriteria_id')->references('kriteria_id')->on('kriteria')->onDelete('cascade');
         });

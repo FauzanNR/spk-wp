@@ -9,9 +9,14 @@ class KriteriaValue extends Model
 {
     use HasFactory;
 
+    protected $table = 'kriteria_value'; // Explicitly define table name
     protected $primaryKey = 'kriteria_value_id';
-    protected $fillable = ['alternatif_id', 'kriteria_id', 'value'];
+    protected $fillable = ['user_id', 'alternatif_id', 'kriteria_id', 'value'];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
     public function alternatif()
     {
         return $this->belongsTo(Alternatif::class, 'alternatif_id');

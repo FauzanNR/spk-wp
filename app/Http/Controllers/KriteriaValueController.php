@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\KriteriaValue;
+use Illuminate\Support\Facades\Exceptions;
+use Illuminate\Support\Facades\Validator;
 
 class KriteriaValueController extends Controller
 {
@@ -30,7 +34,11 @@ class KriteriaValueController extends Controller
         $kriteriaValues = KriteriaValue::all();
         return response()->json($kriteriaValues);
     }
-
+    public function getByUser($userId)
+    {
+        $kriterias = KriteriaValue::where('user_id', $userId)->get();
+        return response()->json($kriterias);
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -45,8 +53,22 @@ class KriteriaValueController extends Controller
             'value' => 'required|integer',
         ]);
 
-        $kriteriaValue = KriteriaValue::create($request->all());
-        return response()->json($kriteriaValue, 201);
+        $validator = Validator::make($request->all(), [
+            'alternatif_id' => 'required|integer|exists:alternatif,alternatif_id',
+            'kriteria_id' => 'required|integer|exists:kriteria,kriteria_id',
+            'value' => 'required|integer',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $kriteriaValue = KriteriaValue::create($request->all());
+            return response()->json($kriteriaValue, 201);
+        } catch (Exception $e) {
+            Log::error('Error creating kriteria value: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to create kriteria value.'], 500);
+        }
     }
 
     /**

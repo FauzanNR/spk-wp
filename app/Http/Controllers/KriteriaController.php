@@ -58,7 +58,7 @@ class KriteriaController extends Controller
             $kriteria = Kriteria::create($request->all());
             return response()->json($kriteria, 201);
         } catch (Exception $e) {
-            Log::error('Error creating alternatif: ' . $e->getMessage());
+            Log::error('Error creating kriteria: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to create kriteria.'], 500);
         }
     }
