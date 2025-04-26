@@ -69,8 +69,12 @@ class KriteriaController extends Controller
      * @param  \App\Models\Kriteria  $kriteria
      * @return \Illuminate\Http\Response
      */
-    public function show(Kriteria $kriteria)
+    public function showById($id)
     {
+        $kriteria = Kriteria::find($id);
+        if (!$kriteria) {
+            return response()->json(['error' => 'Kriteria not found'], 404);
+        }
         return response()->json($kriteria);
     }
 

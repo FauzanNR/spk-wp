@@ -42,7 +42,6 @@
         </div>
     </div>
 
-    JUST MAKE TI SIMPLE, ALL THE KRITERIA WILL AUTOMATICALLY ADDED TO ALTERNATIF-KRITERIA-VALUE WITH VALUE 0, AND BELOW USER JUST NEED TO CHANGE THE VALUE
     <script src="js/kriteria_value.js"></script>
     <div class="bg-white p-6 rounded shadow">
         <h2 class="text-2xl font-bold text-center mb-4">

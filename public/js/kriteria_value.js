@@ -61,7 +61,6 @@ function handleAlternatifSelect() {
                     // Example: if kriteriaData items have kriteria.alternatif_id
                     return kriteria.alternatif_id == selectedAlternatifId;
                 });
-
             if (kriteriaForSelectedAlternatif.length > 0) {
                 renderKriteriaValueFormTable(
                     selectedAlternatifId,
@@ -76,14 +75,34 @@ function handleAlternatifSelect() {
 }
 
 // Function to render the Kriteria Value form table
-function renderKriteriaValueFormTable(alternatifId, kriterias) {
+// Assuming fetchKriteriaById is defined elsewhere and works correctly
+
+// Function to render the Kriteria Value form table
+// Made this function async to await fetch calls inside
+async function renderKriteriaValueFormTable(
+    alternatifId,
+    kriteriasValues,
+    existingKriteriaValues = []
+) {
     const kriteriaValueFormContainer = document.getElementById(
         "kriteria-value-form-container"
     );
 
+    // Clear previous content and show a loading message
+    kriteriaValueFormContainer.innerHTML = "<p>Loading criteria details...</p>";
+
+    // Array to hold promises from fetching each kriteria's details
+    const fetchPromises = kriteriasValues.map((kriteria_value) =>
+        fetchKriteriaById(kriteria_value.kriteria_id)
+    );
+
+    // Wait for all fetch promises to resolve
+    const allKriteriasDetails = await Promise.all(fetchPromises);
+    // Now that we have details for all criteria, build the HTML string
     let formHtml = `
-        <form id="kriteria-value-form" onsubmit="event.preventDefault(); submitKriteriaValues(this);">
-            @csrf {{-- Include CSRF token for the form --}}
+        <form id="kriteria-value-form" onsubmit="event.preventDefault() submitKriteriaValues(this)">
+            <input type="hidden" name="_token" value="[the_generated_csrf_token]">
+            <input type="hidden" name="_method" value="PUT">
             <input type="hidden" name="alternatif_id" value="${alternatifId}">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead>
@@ -97,19 +116,39 @@ function renderKriteriaValueFormTable(alternatifId, kriterias) {
                 <tbody class="bg-white divide-y divide-gray-200">
     `;
 
-    kriterias.forEach((kriteria) => {
+    // Iterate through the fetched details and build table rows
+    allKriteriasDetails.forEach((kriteria, index) => {
+        // Check if fetching details for this kriteria was successful
+        if (!kriteria) {
+            console.warn(
+                `Details not found for kriteria at index ${index}. Skipping row.`
+            );
+            return; // Skip this iteration if kriteria details are missing
+        }
+        // Find the corresponding kriteria_value where kriteria_id matches
+        const kriteria_value = kriteriasValues.find(
+            (kv) => kv.kriteria_id === kriteria.kriteria_id
+        );
         formHtml += `
             <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${kriteria.nama}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${kriteria.tipe}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${kriteria.bobot}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${
+                    kriteria.nama
+                }</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${
+                    kriteria.tipe
+                }</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${
+                    kriteria.bobot
+                }</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <input type="number"
-                           name="kriteria_values[${kriteria.kriteria_ID}]" {{-- Use kriteria_ID as array key --}}
+                           name="kriteria_value[${
+                               kriteria_value.kriteria_id
+                           }, ${kriteria_value.kriteria_value_id}]"
                            class="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                           value="${kriteria_value.value || 0}"
                            required
-                           min="0"> {{-- Add min/max as appropriate for your values --}}
-                    <input type="hidden" name="kriteria_ids[]" value="${kriteria.kriteria_ID}"> {{-- Hidden field for kriteria_id --}}
+                           min="0"> 
                 </td>
             </tr>
         `;
@@ -126,6 +165,7 @@ function renderKriteriaValueFormTable(alternatifId, kriterias) {
         </form>
     `;
 
+    // Set the innerHTML only after all async fetches are complete and HTML is built
     kriteriaValueFormContainer.innerHTML = formHtml;
 }
 
@@ -137,40 +177,37 @@ async function submitKriteriaValues(form) {
     // Collect kriteria values and IDs
     const kriteriaValues = [];
     formData.forEach((value, key) => {
-        // Check if the key starts with 'kriteria_values['
-        if (key.startsWith("kriteria_values[")) {
+        console.log(key, value); // For debugging
+        if (key.startsWith("kriteria_value[")) {
             // Extract kriteria_ID from the key
             const kriteriaId = key.substring(
                 key.indexOf("[") + 1,
                 key.indexOf("]")
             );
+            const kriteriaValueId = key.substring(
+                key.indexOf(",") + 1,
+                key.indexOf("]")
+            );
             kriteriaValues.push({
-                alternatif_id: alternatifId, // Include the selected alternatif ID
+                alternatif_id: parseInt(alternatifId), // Include the selected alternatif ID
                 kriteria_id: parseInt(kriteriaId),
-                value: parseInt(value), // Or parseFloat if your value is decimal
+                kriteria_value_id: parseInt(kriteriaValueId), // Include the kriteria_value ID
+                value: parseFloat(value), // Or parseFloat if your value is decimal
             });
         }
     });
 
-    // You might need to adjust the data structure sent to the backend
-    // based on how your controller expects it.
-    // This example sends an array of objects.
-    const dataToSend = {
-        _token: formData.get("_token"), // Include CSRF token
-        kriteria_values: kriteriaValues,
-    };
-
     try {
-        const response = await fetch("/api/kriteria-value", {
-            // Replace with your actual route
-            method: "POST",
+        const response = await fetch("/api/kriteria-value/", {
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                // CSRF token is already in dataToSend, but can also be in headers if preferred
-                // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
             },
-            body: JSON.stringify(dataToSend),
+            body: JSON.stringify(kriteriaValues),
         });
 
         const result = await response.json();

@@ -38,6 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/alternatif', [AlternatifController::class, 'store'])->name('alternatif.store');
 
     Route::get('/api/kriteria/user/{userId}', [KriteriaController::class, 'getByUser'])->name('kriteria.user');
+    Route::get('/api/kriteria/{id}', [KriteriaController::class, 'showById'])->name('kriteria.getById');
     Route::post('/api/kriteria', [KriteriaController::class, 'store'])->name('kriteria.store');
     Route::delete('/api/kriteria/{id}', [KriteriaController::class, 'destroyById'])->name('kriteria.destroy');
     Route::put('/api/kriteria/{id}', [KriteriaController::class, 'updateById'])->name('kriteria.updateById');
@@ -46,7 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/kriteria-value', [KriteriaValueController::class, 'store'])->name('kriteria-value.store');
     Route::get('/api/kriteria-value/user/{userId}', [KriteriaValueController::class, 'getByUser'])->name('kriteria-value.user');
     Route::delete('/api/kriteria-value/{id}', [KriteriaValueController::class, 'destroyById'])->name('kriteria-value.destroy');
-    Route::put('/api/kriteria-value/{id}', [KriteriaValueController::class, 'updateById'])->name('kriteria-value.updateById');
+    Route::put('/api/kriteria-value/', [KriteriaValueController::class, 'update'])->name('kriteria-value.updateById');
 });
 
 

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('alternatif_id');
             $table->unsignedBigInteger('kriteria_id');
-            $table->integer('value');
+            $table->float('value');
             $table->timestamps();
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->foreign('alternatif_id')->references('alternatif_id')->on('alternatif')->onDelete('cascade');

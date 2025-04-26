@@ -25,6 +25,32 @@ async function fetchKriteriaDataByUser() {
         console.error("Could not fetch alternatives by user:", error);
     }
 }
+
+async function fetchKriteriaById(kriteriaId) {
+    try {
+        const responsePromise = await fetch(`/api/kriteria/${kriteriaId}`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+            },
+        });
+
+        if (!responsePromise.ok) {
+            throw new Error(`HTTP error! status: ${responsePromise.status}`);
+        }
+
+        const kriteria = await responsePromise.json();
+        return kriteria;
+    } catch (error) {
+        console.error("Error fetching kriteria by ID:", error);
+        alert(`Failed to fetch kriteria by ID: ${error.message}`);
+    }
+}
+
 async function addKriteriaValue($data) {
     const userId = parseInt(
         document.getElementById("current_user_id").value.trim()
@@ -112,16 +138,23 @@ async function addKriteria() {
     );
     const nama = document.getElementById("nama").value;
     const bobot = document.getElementById("bobot").value;
-    const keterangan = document.querySelector(
+    const keteranganElement = document.querySelector(
         'input[name="keterangan"]:checked'
-    ).value;
-    data = JSON.stringify({
-        user_id: userId,
-        nama: nama,
-        bobot: bobot,
-        tipe: keterangan,
-    });
+    );
+    const keterangan = keteranganElement ? keteranganElement.value : null;
+
+    if (!nama || !bobot || !keterangan) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
     if (nama && bobot && keterangan) {
+        data = JSON.stringify({
+            user_id: userId,
+            nama: nama,
+            bobot: bobot,
+            tipe: keterangan,
+        });
         try {
             const responsePromise = fetch("/api/kriteria", {
                 method: "POST",
@@ -177,6 +210,9 @@ async function addKriteria() {
             console.error("Error:", error);
             alert(`Failed to add kriteria. Please try again: ${error.message}`);
         }
+    } else {
+        alert("Please fill in all fields.");
+        return;
     }
 }
 
