@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alternatif;
 use Exception;
+use App\Models\Kriteria;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\KriteriaValue;
@@ -12,6 +14,25 @@ use Illuminate\Support\Facades\Validator;
 class KriteriaValueController extends Controller
 {
 
+    public function kriteriaValueWithDetail($kriteriaValueId)
+    {
+        $kriteriaValues = KriteriaValue::where('kriteria_value_id', $kriteriaValueId)
+            ->with('kriteria')
+            ->get()
+            ->map(function ($kriteriaValue) {
+                $kriteria = Kriteria::where('kriteria_id', $kriteriaValue->kriteria_id)->first();
+                $alternatif = Alternatif::where('alternatif_id', $kriteriaValue->alternatif_id)->first();
+                return [
+                    'kriteria_value_id' => $kriteriaValue->kriteria_value_id,
+                    'alternatif_id' => $kriteriaValue->alternatif_id,
+                    'kriteria_id' => $kriteriaValue->kriteria_id,
+                    'value' => $kriteriaValue->value,
+                    'kriteria' => $kriteria ? $kriteria->toArray() : null,
+                    'alternatif' => $alternatif ? $alternatif->toArray() : null,
+                ];
+            });
+        return response()->json($kriteriaValues);
+    }
 
     public function kriteriaValueByAlternatif($alternatifId)
     {
@@ -50,13 +71,13 @@ class KriteriaValueController extends Controller
         $request->validate([
             'alternatif_id' => 'required|exists:alternatif,alternatif_id',
             'kriteria_id' => 'required|exists:kriteria,kriteria_id',
-            'value' => 'required|float',
+            'value' => 'required|numeric',
         ]);
 
         $validator = Validator::make($request->all(), [
             'alternatif_id' => 'required|integer|exists:alternatif,alternatif_id',
             'kriteria_id' => 'required|integer|exists:kriteria,kriteria_id',
-            'value' => 'required|float',
+            'value' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -91,42 +112,33 @@ class KriteriaValueController extends Controller
      */
     public function update(Request $request)
     {
-        $request->validate([
-            'alternatif_id' => 'required|exists:alternatif,alternatif_id',
-            'kriteria_id' => 'required|exists:kriteria,kriteria_id',
-            'value' => 'required|float',
-        ]);
+        $payload = $request->all();
 
-        $validator = Validator::make($request->all(), [
-            'alternatif_id' => 'required|integer|exists:alternatif,alternatif_id',
-            'kriteria_id' => 'required|integer|exists:kriteria,kriteria_id',
-            'value' => 'required|float',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-        foreach ($request->all() as $kriteriaValue) {
-            $kv = KriteriaValue::where('kriteria_value_id', $kriteriaValue->kriteria_value_id)
-                ->first();
+        foreach ($payload as $kriteriaValue) {
+            $validator = Validator::make($kriteriaValue, [
+                'alternatif_id' => 'required|integer|exists:alternatif,alternatif_id',
+                'kriteria_id' => 'required|integer|exists:kriteria,kriteria_id',
+                'kriteria_value_id' => 'required|integer|exists:kriteria_value,kriteria_value_id',
+                'value' => 'required|numeric',
+            ]);
 
-            return response()->json($kv, 200);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $kv = KriteriaValue::where('kriteria_value_id', $kriteriaValue['kriteria_value_id'])->first();
             if ($kv) {
-                if ($kv['kriteria_value_id'] != $kriteriaValue->value) {
-                    $kv->update(['value' => $kriteriaValue->value]);
+                if ($kv->value != $kriteriaValue['value']) {
+                    $kv->update(['value' => $kriteriaValue['value']]);
                 }
             }
         }
-        $existingKriteriaValue = KriteriaValue::where('alternatif_id', $request->alternatif_id)
-            ->where('kriteria_id', $request->kriteria_id)
-            ->first();
-
-        if ($existingKriteriaValue) {
-            if ($existingKriteriaValue->value != $request->value) {
-                $existingKriteriaValue->update(['value' => $request->value]);
-            }
-            return response()->json($existingKriteriaValue, 200);
+        if (empty($payload)) {
+            return response()->json(['message' => 'No data to update'], 400);
         }
+        return response()->json(['message' => 'Kriteria values updated successfully'], 200);
     }
+
 
     /**
      * Remove the specified resource from storage.

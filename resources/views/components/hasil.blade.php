@@ -1,17 +1,14 @@
   <div id="hasil" class="page hidden">
       <div class="bg-white p-6 rounded shadow">
+          <script src="js/hasil.js"></script>
           <h2 class="text-2xl font-bold text-center">
               Hasil Page Content
           </h2>
+          @csrf
+          @method('PUT') {{-- Or @method('PATCH') --}}
           <div class="mt-6">
-              <div id="hasil-container" class="hidden">
+              <div id="hasil-container">
                   <table class="w-full bg-white rounded shadow">
-                      <thead>
-                          <tr>
-                              <th class="border px-4 py-2">Nama</th>
-                              <th class="border px-4 py-2">Nilai</th>
-                          </tr>
-                      </thead>
                       <tbody id="hasil-table">
                           <!-- Data will be inserted here -->
                       </tbody>
@@ -19,3 +16,4 @@
               </div>
           </div>
       </div>
+  </div>

@@ -45,7 +45,7 @@
     <script src="js/kriteria_value.js"></script>
     <div class="bg-white p-6 rounded shadow">
         <h2 class="text-2xl font-bold text-center mb-4">
-            Kriteria Values
+            Assign Kriteria Values for Each Alternatif
         </h2>
         <select
             id="alternatif-select"

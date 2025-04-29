@@ -198,6 +198,7 @@ async function addKriteria() {
                     renderKriteriaTable();
                     addKriteriaValue(data);
                     document.getElementById("kriteria-form").reset();
+                    alert("Kriteria added successfully!");
                 })
                 .catch((error) => {
                     console.error("Error:", error);

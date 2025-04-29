@@ -19,6 +19,7 @@ async function fetchKriteriaValueDataByUser() {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         window.kriteriaValueData = await response.json();
+        return window.kriteriaValueData;
     } catch (error) {
         console.error("Could not fetch alternatives by user:", error);
     }
@@ -100,7 +101,7 @@ async function renderKriteriaValueFormTable(
     const allKriteriasDetails = await Promise.all(fetchPromises);
     // Now that we have details for all criteria, build the HTML string
     let formHtml = `
-        <form id="kriteria-value-form" onsubmit="event.preventDefault() submitKriteriaValues(this)">
+        <form id="kriteria-value-form" onsubmit="event.preventDefault(); submitKriteriaValues(this);">
             <input type="hidden" name="_token" value="[the_generated_csrf_token]">
             <input type="hidden" name="_method" value="PUT">
             <input type="hidden" name="alternatif_id" value="${alternatifId}">
@@ -177,13 +178,13 @@ async function submitKriteriaValues(form) {
     // Collect kriteria values and IDs
     const kriteriaValues = [];
     formData.forEach((value, key) => {
-        console.log(key, value); // For debugging
         if (key.startsWith("kriteria_value[")) {
             // Extract kriteria_ID from the key
             const kriteriaId = key.substring(
                 key.indexOf("[") + 1,
                 key.indexOf("]")
             );
+            //        // Extract kriteria_value ID from the key
             const kriteriaValueId = key.substring(
                 key.indexOf(",") + 1,
                 key.indexOf("]")
@@ -196,9 +197,10 @@ async function submitKriteriaValues(form) {
             });
         }
     });
-
+    console.log("Submitting kriteria values:", kriteriaValues); // For debugging
+    // return;
     try {
-        const response = await fetch("/api/kriteria-value/", {
+        const response = await fetch("/api/kriteria-value", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -238,7 +240,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetchDataByUser().then(() => {
             populateAlternatifDropdown(); // Populate dropdown after fetching alternatives
         });
-        fetchKriteriaDataByUser(); // Fetch kriteria data (assuming it's needed globally)
+        fetchKriteriaValueDataByUser();
     } else {
         console.error("Element with ID 'current_user_id' not found.");
     }
