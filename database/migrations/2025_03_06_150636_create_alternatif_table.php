@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('alternatif', function (Blueprint $table) {
             $table->id('alternatif_id');
             $table->unsignedBigInteger('user_id');
-            $table->string('name');
+            $table->string('nama');
             $table->string('code');
             $table->timestamps();
 

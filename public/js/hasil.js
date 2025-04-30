@@ -77,7 +77,7 @@ async function generateHasilTable() {
                 product *= Math.pow(value, power);
             });
             return {
-                alternatif: alt.alternatif.name,
+                alternatif: alt.alternatif.nama,
                 score: product,
             };
         });

@@ -30,13 +30,13 @@ class AlternatifController extends Controller
     {
         $request->validate([
             'user_id' => 'required|integer|exists:users,user_id',
-            'name' => 'required|string|max:255',
+            'nama' => 'required|string|max:255',
             'code' => 'required|string|max:255',
         ]);
 
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer|exists:users,user_ID',
-            'name' => 'required|string|max:255',
+            'nama' => 'required|string|max:255',
             'code' => 'required|string|max:255',
         ]);
 
@@ -97,7 +97,7 @@ class AlternatifController extends Controller
     {
         $request->validate([
             'user_id' => 'required|integer|exists:users,user_id',
-            'name' => 'required|string|max:255',
+            'nama' => 'required|string|max:255',
             'code' => 'required|string|max:255',
         ]);
 
@@ -108,7 +108,7 @@ class AlternatifController extends Controller
         }
 
         Alternatif::where('alternatif_id', $id)->update([
-            'name' => $request->name,
+            'nama' => $request->name,
             'code' => $request->code,
         ]);
 

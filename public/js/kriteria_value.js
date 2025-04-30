@@ -33,7 +33,7 @@ function populateAlternatifDropdown() {
         window.data.forEach((alternatif) => {
             const option = document.createElement("option");
             option.value = alternatif.alternatif_id; // Use the correct ID from your model/schema
-            option.textContent = alternatif.name; // Use the correct name field
+            option.textContent = alternatif.nama; // Use the correct name field
             alternatifSelect.appendChild(option);
         });
     }

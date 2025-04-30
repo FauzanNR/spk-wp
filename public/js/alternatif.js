@@ -48,7 +48,7 @@ async function addData() {
                 },
                 body: JSON.stringify({
                     user_id: userId,
-                    name: name,
+                    nama: name,
                     code: code,
                 }),
             });
@@ -112,7 +112,7 @@ async function editData() {
     if (newName && newCode) {
         if (confirm("Are you sure you want to update this item?")) {
             const id = alternatifData.alternatif_id;
-            alternatifData.name = newName;
+            alternatifData.nama = newName;
             alternatifData.code = newCode;
             try {
                 const response = await fetch(`/api/alternatif/${id}`, {
@@ -179,7 +179,7 @@ function renderTable() {
     window.data.forEach((item, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td class="border px-4 py-2">${item.name}</td>
+            <td class="border px-4 py-2">${item.nama}</td>
             <td class="border px-4 py-2">${item.code}</td>
             <td class="border px-4 py-2">
                 <button onclick="openEditModal(${index})" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
@@ -207,7 +207,7 @@ function openEditModal($index) {
     document.getElementById("edit-alternatif-modal").classList.remove("hidden");
 
     document.getElementById("alternatif-data-id-on-edit").value = $index;
-    document.getElementById("edit-alternatif-name").value = data[$index].name;
+    document.getElementById("edit-alternatif-name").value = data[$index].nama;
     document.getElementById("edit-alternatif-code").value = data[$index].code;
 }
 

@@ -33,7 +33,7 @@ class Alternatif extends Model
     protected $fillable = [
         'alternatif_id', // Include primary key if it's not auto-incrementing and you need to mass-assign it
         'user_id',
-        'name',
+        'nama',
         'code'
     ];
 
