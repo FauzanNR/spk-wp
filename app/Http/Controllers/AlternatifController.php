@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alternatif;
+use App\Models\Kriteria;
+use App\Models\KriteriaValue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -42,13 +44,33 @@ class AlternatifController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
         // Check if the user_id exists in the users table
+        $alternatif = null;
         try {
             $alternatif = Alternatif::create($request->all());
-            return response()->json($alternatif, 201);
+
+            // Check if kriteria exists for the given user_id
+            $kriteriaExists = Kriteria::where('user_id', $request->user_id)->exists();
+
+            if ($kriteriaExists) {
+                try {
+                    Kriteria::where('user_id', $request->user_id)->each(function ($kriteria) use ($alternatif) {
+                        KriteriaValue::create([
+                            'kriteria_id' => $kriteria->kriteria_id,
+                            'alternatif_id' => $alternatif->alternatif_id,
+                            'user_id' => $alternatif->user_id, // Include user_id
+                            'value' => 0, // Default value
+                        ]);
+                    });
+                } catch (Exception $e) {
+                    Log::error('Error creating kriteria values: ' . $e->getMessage());
+                    return response()->json(['error' => 'Failed to create kriteria values.'], 500);
+                }
+            }
         } catch (Exception $e) {
             Log::error('Error creating alternatif: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to create alternatif.'], 500);
         }
+        return response()->json($alternatif, 201);
     }
 
     /**

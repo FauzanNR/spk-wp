@@ -37,7 +37,6 @@ async function fetchData() {
 
 async function generateHasilTable() {
     await fetchData().then(() => {
-        console.log("kriteriaValueDetail", window.kriteriaValueDetail);
         const container = document.getElementById("hasil-container");
         container.innerHTML = "";
 

@@ -138,6 +138,7 @@ class KriteriaController extends Controller
         // $kriteria->delete();
         // Or use the where method to delete the kriteria by ID
         Kriteria::where('kriteria_id', $kriteria_id)->delete();
+        KriteriaValue::where('kriteria_id', $kriteria_id)->delete();
 
         return response()->json([
             'message' => 'kriteria deleted successfully.',
