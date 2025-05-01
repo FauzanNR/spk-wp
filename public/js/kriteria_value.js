@@ -172,6 +172,10 @@ async function renderKriteriaValueFormTable(
 
 // Function to submit the Kriteria Value form via AJAX
 async function submitKriteriaValues(form) {
+    if (!confirm("Are you sure you want to save the kriteria values?")) {
+        handleAlternatifSelect();
+        return; // User canceled the action
+    }
     const formData = new FormData(form);
     const alternatifId = formData.get("alternatif_id"); // Get the selected alternatif ID
 
@@ -197,8 +201,7 @@ async function submitKriteriaValues(form) {
             });
         }
     });
-    console.log("Submitting kriteria values:", kriteriaValues); // For debugging
-    // return;
+
     try {
         const response = await fetch("/api/kriteria-value", {
             method: "PUT",
@@ -215,7 +218,7 @@ async function submitKriteriaValues(form) {
         const result = await response.json();
 
         if (response.ok) {
-            console.log("Kriteria values saved successfully:", result);
+            console.log("Kriteria values saved successfully:");
             // Handle success (e.g., show a success message, clear the form, refresh data)
             alert("Kriteria values saved successfully!");
             // Optionally, clear the form or refresh the table
@@ -234,8 +237,7 @@ async function submitKriteriaValues(form) {
     }
 }
 
-// Call fetch functions when the page loads (assuming current_user_id is available)
-document.addEventListener("DOMContentLoaded", function () {
+function loadDataForKriteriaValue() {
     if (document.getElementById("current_user_id")) {
         fetchDataByUser().then(() => {
             populateAlternatifDropdown(); // Populate dropdown after fetching alternatives
@@ -244,4 +246,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         console.error("Element with ID 'current_user_id' not found.");
     }
-});
+}
+
+// Call fetch functions when the page loads (assuming current_user_id is available)
+document.addEventListener("DOMContentLoaded", loadDataForKriteriaValue);

@@ -19,7 +19,6 @@ async function fetchDataByUser() {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         window.data = await response.json();
-        renderTable();
     } catch (error) {
         console.error("Could not fetch alternatives by user:", error);
     }
@@ -109,6 +108,7 @@ async function editData() {
         alert("Please fill in the Name and Code fields.");
         return;
     }
+
     if (newName && newCode) {
         if (confirm("Are you sure you want to update this item?")) {
             const id = alternatifData.alternatif_id;
@@ -125,8 +125,20 @@ async function editData() {
                     },
                     body: JSON.stringify(alternatifData),
                 });
-                renderTable();
-                closeEditModal();
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error("Error updating alternative:", errorData);
+                    alert(
+                        `Error updating alternative: ${
+                            errorData.message || "Unknown error"
+                        }`
+                    );
+                    return;
+                } else {
+                    renderTable();
+                    closeEditModal();
+                }
             } catch (error) {
                 console.error("Could not update alternative:", error);
                 alert(`Could not update alternative: ${error.message}`);
@@ -196,10 +208,15 @@ function renderTable() {
     form.action = "/api/alternatif";
     addButton.textContent = "Add";
     addButton.onclick = addData;
+    loadDataForKriteriaValue();
 }
 
 // Fetch initial data when the page loads
-document.addEventListener("DOMContentLoaded", fetchDataByUser);
+document.addEventListener("DOMContentLoaded", function () {
+    fetchDataByUser().then(() => {
+        renderTable();
+    });
+});
 
 // Modal open/close for edit
 function openEditModal($index) {

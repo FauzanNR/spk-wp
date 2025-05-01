@@ -24,7 +24,7 @@ async function fetchKriteriaValueDataDetailById(id) {
 
 async function fetchData() {
     const kriteriaData = await fetchKriteriaValueDataByUser();
-
+    window.kriteriaValueDetail.length = 0; // Clear previous data
     await Promise.all(
         kriteriaData.map(async (k) => {
             const data = await fetchKriteriaValueDataDetailById(
@@ -36,6 +36,7 @@ async function fetchData() {
 }
 
 async function generateHasilTable() {
+    groupedData = null;
     await fetchData().then(() => {
         const container = document.getElementById("hasil-container");
         container.innerHTML = "";
@@ -45,18 +46,28 @@ async function generateHasilTable() {
                 '<p class="text-center text-gray-600">Please add Alternatif and Kriteria data to see the calculation.</p>';
             return;
         }
-
         // Group data by alternatif_id
-        const groupedData = window.kriteriaValueDetail.reduce((acc, item) => {
-            if (!acc[item.alternatif_id]) {
-                acc[item.alternatif_id] = {
-                    alternatif: item.alternatif,
+        groupedData = window.kriteriaValueDetail.reduce((accumulator, item) => {
+            if (!accumulator[item.alternatif_id]) {
+                accumulator[item.alternatif_id] = {
+                    alternatif: { ...item.alternatif }, // Clone the alternatif object
                     values: [],
                 };
             }
-            acc[item.alternatif_id].values.push(item);
-            return acc;
+            accumulator[item.alternatif_id].values.push(item);
+            return accumulator;
         }, {});
+
+        // Update alternatif names dynamically
+        Object.values(groupedData).forEach((group) => {
+            const updatedAlternatif = window.kriteriaValueDetail.find(
+                (item) => item.alternatif_id === group.alternatif.alternatif_id
+            )?.alternatif;
+            if (updatedAlternatif) {
+                // alert("Generating Hasil Table...");
+                group.alternatif.nama = updatedAlternatif.nama;
+            }
+        });
 
         // Normalize weights (Bobot) for WP method
         const totalWeight = Object.values(groupedData)[0].values.reduce(
@@ -65,7 +76,7 @@ async function generateHasilTable() {
         );
 
         // Calculate weighted powers for each alternatif
-        const weightedPowers = Object.values(groupedData).map((alt) => {
+        weightedPowers = Object.values(groupedData).map((alt) => {
             let product = 1;
             alt.values.forEach((item) => {
                 const weight = parseFloat(item.kriteria.bobot) / totalWeight;
@@ -88,7 +99,7 @@ async function generateHasilTable() {
         // Build table
         const table = document.createElement("table");
         table.className = "w-full bg-white rounded shadow text-center";
-
+        table.innerHTML = "";
         // Table header
         const thead = document.createElement("thead");
         const headerRow = document.createElement("tr");

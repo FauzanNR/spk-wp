@@ -108,7 +108,7 @@ class AlternatifController extends Controller
         }
 
         Alternatif::where('alternatif_id', $id)->update([
-            'nama' => $request->name,
+            'nama' => $request->nama,
             'code' => $request->code,
         ]);
 

@@ -42,10 +42,10 @@
         </div>
     </div>
 
-    <script src="js/kriteria_value.js"></script>
+
     <div class="bg-white p-6 rounded shadow">
         <h2 class="text-2xl font-bold text-center mb-4">
-            Assign Kriteria Values for Each Alternatif
+            Berikan Niali pada Kriteria untuk Tiap Alternatif
         </h2>
         <select
             id="alternatif-select"

@@ -147,6 +147,8 @@
     <script src="js/dashboard.js"></script> <!-- Include the dashboard script -->
     <script src="js/alternatif.js"></script> <!-- Include the alternatif script -->
     <script src="js/kriteria.js"></script> <!-- Include the alternatif script -->
+    <script src="js/kriteria_value.js"></script>
+    <script src="js/hasil.js"></script>
 </body>
 
 </html>

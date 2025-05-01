@@ -322,6 +322,7 @@ function renderKriteriaTable() {
     form.action = "/api/kriteria";
     addButton.textContent = "Add";
     addButton.onclick = addKriteria;
+    loadDataForKriteriaValue();
 }
 
 // Fetch initial data when the page loads
