@@ -70,31 +70,58 @@ async function generateHasilTable() {
         });
 
         // Normalize weights (Bobot) for WP method
-        const totalWeight = Object.values(groupedData)[0].values.reduce(
-            (sum, item) => sum + parseFloat(item.kriteria.bobot),
-            0
+        // --- Step 1: Normalize Weights ---
+        const weights = Object.values(groupedData)[0].values.map((item) =>
+            parseFloat(item.kriteria.bobot)
+        );
+        const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+        const normalizedWeights = weights.map((weight) => weight / totalWeight);
+
+        // --- Step 2: Prepare Alternatives and Criterion Types ---
+        const alternatives = Object.values(groupedData).map(
+            (alt) => alt.values.map((item) => parseFloat(item.value) || 1) // fallback 1 if no value
+        );
+        const criterionTypes = Object.values(groupedData)[0].values.map(
+            (item) => (item.kriteria.tipe.toLowerCase() === "cost" ? -1 : 1)
         );
 
-        // Calculate weighted powers for each alternatif
-        weightedPowers = Object.values(groupedData).map((alt) => {
-            let product = 1;
-            alt.values.forEach((item) => {
-                const weight = parseFloat(item.kriteria.bobot) / totalWeight;
-                const value = parseFloat(item.value) || 1; // fallback 1 if no value
-                const power =
-                    item.kriteria.tipe.toLowerCase() === "cost"
-                        ? -weight
-                        : weight;
-                product *= Math.pow(value, power);
-            });
-            return {
-                alternatif: alt.alternatif.nama,
-                score: product,
-            };
-        });
+        // --- Step 3: Calculate Vector S ---
+        function calculateSVector(
+            alternatives,
+            normalizedWeights,
+            criterionTypes
+        ) {
+            const sVector = [];
+            for (let i = 0; i < alternatives.length; i++) {
+                let sValue = 1;
+                for (let j = 0; j < alternatives[i].length; j++) {
+                    const exponent = normalizedWeights[j] * criterionTypes[j];
+                    sValue *= Math.pow(alternatives[i][j], exponent);
+                }
+                sVector.push(sValue);
+            }
+            return sVector;
+        }
+        const sVector = calculateSVector(
+            alternatives,
+            normalizedWeights,
+            criterionTypes
+        );
 
-        // Sort descending by score
-        weightedPowers.sort((a, b) => b.score - a.score);
+        // --- Step 4: Calculate Vector V ---
+        function calculateVVector(sVector) {
+            const totalS = sVector.reduce((sum, s) => sum + s, 0);
+            return sVector.map((s) => s / totalS);
+        }
+        const vVector = calculateVVector(sVector);
+
+        // --- Step 5: Rank Alternatives ---
+        const rankedAlternatives = vVector
+            .map((value, index) => ({
+                alternatif: Object.values(groupedData)[index].alternatif.nama,
+                score: value,
+            }))
+            .sort((a, b) => b.score - a.score);
 
         // Build normalized weight table
         const weightTable = document.createElement("table");
@@ -135,6 +162,64 @@ async function generateHasilTable() {
         container.appendChild(heading);
         // Append normalized weight table to the container
         container.appendChild(weightTable);
+        // --- Display Vector S and Vector V Tables ---
+        const sVTable = document.createElement("table");
+        sVTable.className = "w-full bg-white rounded shadow text-center mt-4";
+        sVTable.innerHTML = "";
+
+        // Table header for Vector S and Vector V
+        const sVThead = document.createElement("thead");
+        const sVHeaderRow = document.createElement("tr");
+        sVHeaderRow.innerHTML = `
+            <th class="border px-4 py-2">Alternatif</th>
+            <th class="border px-4 py-2">Vector S</th>
+            <th class="border px-4 py-2">Vector V</th>
+        `;
+        sVThead.appendChild(sVHeaderRow);
+        sVTable.appendChild(sVThead);
+
+        // Table body for Vector S and Vector V
+        const sVTbody = document.createElement("tbody");
+        sVector.forEach((sValue, index) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+            <td class="border px-4 py-2">${
+                Object.values(groupedData)[index].alternatif.nama
+            }</td>
+            <td class="border px-4 py-2">${sValue.toFixed(6)}</td>
+            <td class="border px-4 py-2">${vVector[index].toFixed(6)}</td>
+            `;
+            sVTbody.appendChild(tr);
+        });
+        sVTable.appendChild(sVTbody);
+
+        // Create and append the heading for Vector S and Vector V
+        const headingSV = document.createElement("h4");
+        headingSV.className = "text-2xl font-bold text-center";
+        headingSV.textContent = "Perhitungan Vector S dan Vector V";
+        container.appendChild(headingSV);
+        // Append Vector S and Vector V table to the container
+        container.appendChild(sVTable);
+        // Calculate weighted powers for each alternatif
+        weightedPowers = Object.values(groupedData).map((alt) => {
+            let product = 1;
+            alt.values.forEach((item) => {
+                const weight = parseFloat(item.kriteria.bobot) / totalWeight;
+                const value = parseFloat(item.value) || 1; // fallback 1 if no value
+                const power =
+                    item.kriteria.tipe.toLowerCase() === "cost"
+                        ? -weight
+                        : weight;
+                product *= Math.pow(value, power);
+            });
+            return {
+                alternatif: alt.alternatif.nama,
+                score: product,
+            };
+        });
+
+        // Sort descending by score
+        weightedPowers.sort((a, b) => b.score - a.score);
 
         // Build table
         const table = document.createElement("table");
@@ -166,7 +251,7 @@ async function generateHasilTable() {
         //hasil table
         const heading2 = document.createElement("h4");
         heading2.className = "text-2xl font-bold text-center";
-        heading2.textContent = "Hasil Perhitungan WP";
+        heading2.textContent = "Hasil Akhir Perhitungan WP";
         container.appendChild(heading2);
         container.appendChild(table);
     });
