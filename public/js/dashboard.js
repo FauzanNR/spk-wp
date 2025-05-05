@@ -66,14 +66,13 @@ function showPage(pageId, element) {
         // fetchKriteriaDataByUser();
         pageTitle.textContent = "Kriteria";
     } else if (pageId === "hasil") {
-        pageTitle.textContent = `Hasil${q++}`;
+        pageTitle.textContent = `Hasil`;
         a = async function () {
             await generateHasilTable();
         };
         a();
     }
 }
-q = 0;
 setTimeout(() => {
     const loginAlert = document.getElementById("login-alert");
     if (loginAlert) {
