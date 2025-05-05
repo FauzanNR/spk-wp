@@ -96,6 +96,46 @@ async function generateHasilTable() {
         // Sort descending by score
         weightedPowers.sort((a, b) => b.score - a.score);
 
+        // Build normalized weight table
+        const weightTable = document.createElement("table");
+        weightTable.className =
+            "w-full bg-white rounded shadow text-center mt-4";
+        weightTable.innerHTML = "";
+
+        // Table header for normalized weights
+        const weightThead = document.createElement("thead");
+        const weightHeaderRow = document.createElement("tr");
+        weightHeaderRow.innerHTML = `
+            <th class="border px-4 py-2">Kriteria</th>
+            <th class="border px-4 py-2">Bobot</th>
+            <th class="border px-4 py-2">Normalized Weight</th>
+        `;
+        weightThead.appendChild(weightHeaderRow);
+        weightTable.appendChild(weightThead);
+
+        // Table body for normalized weights
+        const weightTbody = document.createElement("tbody");
+        Object.values(groupedData)[0].values.forEach((item) => {
+            const tr = document.createElement("tr");
+            const weight = parseFloat(item.kriteria.bobot);
+            const normalizedWeight = weight / totalWeight;
+            tr.innerHTML = `
+                <td class="border px-4 py-2">${item.kriteria.nama}</td>
+                <td class="border px-4 py-2">${weight.toFixed(6)}</td>
+                <td class="border px-4 py-2">${normalizedWeight.toFixed(6)}</td>
+            `;
+            weightTbody.appendChild(tr);
+        });
+        weightTable.appendChild(weightTbody);
+
+        // Create and append the heading for normalized weights
+        const heading = document.createElement("h4");
+        heading.className = "text-2xl font-bold text-center";
+        heading.textContent = "Bobot yang di Normalisasi";
+        container.appendChild(heading);
+        // Append normalized weight table to the container
+        container.appendChild(weightTable);
+
         // Build table
         const table = document.createElement("table");
         table.className = "w-full bg-white rounded shadow text-center";
@@ -123,7 +163,11 @@ async function generateHasilTable() {
             tbody.appendChild(tr);
         });
         table.appendChild(tbody);
-
+        //hasil table
+        const heading2 = document.createElement("h4");
+        heading2.className = "text-2xl font-bold text-center";
+        heading2.textContent = "Hasil Perhitungan WP";
+        container.appendChild(heading2);
         container.appendChild(table);
     });
 }
