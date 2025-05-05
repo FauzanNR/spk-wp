@@ -9,6 +9,7 @@ use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\KriteriaValueController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('login');
@@ -49,6 +50,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/api/kriteria-value/{id}', [KriteriaValueController::class, 'destroyById'])->name('kriteria-value.destroy');
     Route::put('/api/kriteria-value', [KriteriaValueController::class, 'update'])->name('kriteria-value.updateById');
     Route::get('/api/kriteria-value-detail/{id}', [KriteriaValueController::class, 'kriteriaValueWithDetail'])->name('kriteria-value-detail');
+
+
+
+
+    Route::get('/api/user/{id}', [UserController::class, 'getUserById'])->name('user.getById');
+    Route::put('/api/user/{id}/name', [UserController::class, 'updateName'])->name('user.updateName');
+    Route::put('/api/user/{id}/email', [UserController::class, 'updateEmail'])->name('user.updateEmail');
+    Route::put('/api/user/{id}/password', [UserController::class, 'updatePassword'])->name('user.updatePassword');
 });
 
 
