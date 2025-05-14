@@ -142,7 +142,7 @@ async function renderKriteriaValueFormTable(
                     kriteria.bobot
                 }</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <input type="number"
+                    <input type="number" step="0.001"
                            name="kriteria_value[${
                                kriteria_value.kriteria_id
                            }, ${kriteria_value.kriteria_value_id}]"

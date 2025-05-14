@@ -98,10 +98,12 @@ async function generateHasilTable() {
                     const exponent = normalizedWeights[j] * criterionTypes[j];
                     sValue *= Math.pow(alternatives[i][j], exponent);
                 }
+
                 sVector.push(sValue);
             }
             return sVector;
         }
+
         const sVector = calculateSVector(
             alternatives,
             normalizedWeights,
@@ -148,8 +150,8 @@ async function generateHasilTable() {
             const normalizedWeight = weight / totalWeight;
             tr.innerHTML = `
                 <td class="border px-4 py-2">${item.kriteria.nama}</td>
-                <td class="border px-4 py-2">${weight.toFixed(6)}</td>
-                <td class="border px-4 py-2">${normalizedWeight.toFixed(6)}</td>
+                <td class="border px-4 py-2">${weight.toFixed(0)}</td>
+                <td class="border px-4 py-2">${normalizedWeight.toFixed(1)}</td>
             `;
             weightTbody.appendChild(tr);
         });
@@ -162,24 +164,23 @@ async function generateHasilTable() {
         container.appendChild(heading);
         // Append normalized weight table to the container
         container.appendChild(weightTable);
-        // --- Display Vector S and Vector V Tables ---
-        const sVTable = document.createElement("table");
-        sVTable.className = "w-full bg-white rounded shadow text-center mt-4";
-        sVTable.innerHTML = "";
+        // --- Display Vector S Table Only ---
+        const sTable = document.createElement("table");
+        sTable.className = "w-full bg-white rounded shadow text-center mt-4";
+        sTable.innerHTML = "";
 
-        // Table header for Vector S and Vector V
-        const sVThead = document.createElement("thead");
-        const sVHeaderRow = document.createElement("tr");
-        sVHeaderRow.innerHTML = `
+        // Table header for Vector S
+        const sThead = document.createElement("thead");
+        const sHeaderRow = document.createElement("tr");
+        sHeaderRow.innerHTML = `
             <th class="border px-4 py-2">Alternatif</th>
             <th class="border px-4 py-2">Vector S</th>
-            <th class="border px-4 py-2">Vector V</th>
         `;
-        sVThead.appendChild(sVHeaderRow);
-        sVTable.appendChild(sVThead);
+        sThead.appendChild(sHeaderRow);
+        sTable.appendChild(sThead);
 
-        // Table body for Vector S and Vector V
-        const sVTbody = document.createElement("tbody");
+        // Table body for Vector S
+        const sTbody = document.createElement("tbody");
         sVector.forEach((sValue, index) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
@@ -187,19 +188,19 @@ async function generateHasilTable() {
                 Object.values(groupedData)[index].alternatif.nama
             }</td>
             <td class="border px-4 py-2">${sValue.toFixed(6)}</td>
-            <td class="border px-4 py-2">${vVector[index].toFixed(6)}</td>
             `;
-            sVTbody.appendChild(tr);
+            sTbody.appendChild(tr);
         });
-        sVTable.appendChild(sVTbody);
+        sTable.appendChild(sTbody);
 
-        // Create and append the heading for Vector S and Vector V
-        const headingSV = document.createElement("h4");
-        headingSV.className = "text-2xl font-bold text-center";
-        headingSV.textContent = "Perhitungan Vector S dan Vector V";
-        container.appendChild(headingSV);
-        // Append Vector S and Vector V table to the container
-        container.appendChild(sVTable);
+        // Create and append the heading for Vector S
+        const headingS = document.createElement("h4");
+        headingS.className = "text-2xl font-bold text-center";
+        headingS.textContent = "Perhitungan Vector S";
+        container.appendChild(headingS);
+        // Append Vector S table to the container
+        container.appendChild(sTable);
+
         // Calculate weighted powers for each alternatif
         weightedPowers = Object.values(groupedData).map((alt) => {
             let product = 1;
@@ -220,8 +221,7 @@ async function generateHasilTable() {
 
         // Sort descending by score
         weightedPowers.sort((a, b) => b.score - a.score);
-
-        // Build table
+        // Build table based on vector V data
         const table = document.createElement("table");
         table.className = "w-full bg-white rounded shadow text-center";
         table.innerHTML = "";
@@ -231,27 +231,36 @@ async function generateHasilTable() {
         headerRow.innerHTML = `
         <th class="border px-4 py-2">Rank</th>
         <th class="border px-4 py-2">Alternatif</th>
-        <th class="border px-4 py-2">Score (WP)</th>
-          `;
+        <th class="border px-4 py-2">Score (Vector V)</th>
+        `;
         thead.appendChild(headerRow);
         table.appendChild(thead);
 
+        // Prepare ranking based on vector V
+        const vRanked = vVector
+            .map((score, idx) => ({
+                alternatif: Object.values(groupedData)[idx].alternatif.nama,
+                score,
+            }))
+            .sort((a, b) => b.score - a.score);
+
         // Table body
         const tbody = document.createElement("tbody");
-        weightedPowers.forEach((item, index) => {
+        vRanked.forEach((item, index) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-          <td class="border px-4 py-2">${index + 1}</td>
-          <td class="border px-4 py-2">${item.alternatif}</td>
-          <td class="border px-4 py-2">${item.score.toFixed(6)}</td>
-        `;
+            <td class="border px-4 py-2">${index + 1}</td>
+            <td class="border px-4 py-2">${item.alternatif}</td>
+            <td class="border px-4 py-2">${item.score.toFixed(6)}</td>
+            `;
             tbody.appendChild(tr);
         });
         table.appendChild(tbody);
         //hasil table
         const heading2 = document.createElement("h4");
         heading2.className = "text-2xl font-bold text-center";
-        heading2.textContent = "Hasil Akhir Perhitungan WP";
+        heading2.textContent =
+            "Hasil Akhir Perhitungan WP (Berdasarkan Vector V)";
         container.appendChild(heading2);
         container.appendChild(table);
     });
